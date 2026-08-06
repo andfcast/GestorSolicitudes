@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GestorSolicitudes.Domain.Repositories
+{
+    public interface IUnitOfWork : IDisposable
+    {
+        IUsuarioRepository Usuarios { get; }
+        ISolicitudRepository Solicitudes { get; }
+        Task<int> CompleteAsync();
+    }
+}
