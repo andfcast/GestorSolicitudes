@@ -69,11 +69,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "EduApoyos API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "GestorSolicitudes API", Version = "v1" });
 
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
+    if (File.Exists(xmlPath))
+        c.IncludeXmlComments(xmlPath);
 
     // Habilita el botón "Authorize" con el candado para enviar el Token JWT
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
