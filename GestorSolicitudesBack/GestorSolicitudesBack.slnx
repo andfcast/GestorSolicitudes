@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Aplicacion/">
+    <Project Path="GestorSolicitudes.Application/GestorSolicitudes.Application.csproj" />
+  </Folder>
+  <Folder Name="/Dominio/">
+    <Project Path="GestorSolicitudes.Domain/GestorSolicitudes.Domain.csproj" />
+  </Folder>
+  <Folder Name="/Infraestructure/">
+    <Project Path="GestorSolicitudes.Infrastructure/GestorSolicitudes.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Presentacion/">
+    <Project Path="GestorSolicitudes.API/GestorSolicitudes.API.csproj" />
+  </Folder>
+</Solution>
