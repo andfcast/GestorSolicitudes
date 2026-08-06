@@ -11,5 +11,7 @@ namespace GestorSolicitudes.Domain.Repositories
     {
         Task<Solicitud?> GetByCodigoAsync(string codigo);
         Task<IEnumerable<Solicitud>> GetSolicitudesConResponsableAsync();
+        Task<IEnumerable<Solicitud>> GetByUsuarioResponsableAsync(int usuarioId, string? estado = null, string? prioridad = null);
+        Task<Solicitud?> GetByIdWithDetailsAsync(int id);
     }
 }

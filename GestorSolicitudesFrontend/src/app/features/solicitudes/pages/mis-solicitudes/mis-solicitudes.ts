@@ -1,0 +1,69 @@
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SolicitudService } from '../../../../core/services/solicitud.service';
+import { Solicitud, SolicitudDto } from '../../../../core/models/solicitud.models';
+import { CrearSolicitudModal } from "../../components/crear-solicitud-modal/crear-solicitud-modal";
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-mis-solicitudes',
+  imports: [CommonModule, FormsModule, CrearSolicitudModal],
+  templateUrl: './mis-solicitudes.html',
+  styleUrl: './mis-solicitudes.scss',
+})
+export class MisSolicitudes implements OnInit {
+  private solicitudService = inject(SolicitudService);
+
+  // Estados Reactivos con Signals
+  solicitudes = signal<SolicitudDto[]>([]);
+  isLoading = signal<boolean>(true);
+  errorMessage = signal<string | null>(null);
+
+  // Filtros Combinados (HU-03)
+  filtroEstado = signal<string>('');
+  filtroPrioridad = signal<string>('');
+
+  // Control del Modal de Creación (HU-02)
+  mostrarModalCrear = signal<boolean>(false);
+
+  ngOnInit(): void {
+    this.cargarSolicitudes();
+  }
+
+  cargarSolicitudes(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    const estado = this.filtroEstado() || undefined;
+    const prioridad = this.filtroPrioridad() || undefined;
+
+    this.solicitudService.getMisSolicitudes(estado, prioridad).subscribe({
+      next: (data) => {
+        this.solicitudes.set(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error al cargar solicitudes:', err);
+        this.errorMessage.set('No se pudo conectar con el servidor para obtener el listado de solicitudes.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  onFiltroChange(): void {
+    this.cargarSolicitudes();
+  }
+
+  limpiarFiltros(): void {
+    this.filtroEstado.set('');
+    this.filtroPrioridad.set('');
+    this.cargarSolicitudes();
+  }
+
+  actualizarEstado(id: number, nuevoEstado: string): void {
+    this.solicitudService.cambiarEstado(id, nuevoEstado).subscribe({
+      next: () => this.cargarSolicitudes(),
+      error: () => alert('Ocurrió un error al actualizar el estado de la solicitud.')
+    });
+  }
+}

@@ -33,9 +33,14 @@ export class Login {
     this.errorMessage.set(null);
 
     this.authService.login(this.loginForm.getRawValue()).subscribe({
-      next: () => {
+      next: (response) => {
+        debugger;
         this.isLoading.set(false);
-        this.router.navigate(['/solicitudes']); // Redirigir al dashboard o lista de solicitudes
+        if (response.rol === 'Agente' || response.rol === 'Asesor') {
+          this.router.navigate(['/dashboard/mis-solicitudes']);
+        } else if (response.rol === 'Administrador') {
+          this.router.navigate(['/dashboard/todas-solicitudes']);
+        }
       },
       error: (err) => {
         this.isLoading.set(false);

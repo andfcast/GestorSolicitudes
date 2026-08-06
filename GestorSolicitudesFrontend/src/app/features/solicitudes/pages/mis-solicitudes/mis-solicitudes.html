@@ -1,0 +1,138 @@
+<div class="page-container">
+  <!-- Cabecera -->
+  <div class="page-header">
+    <div>
+      <h2>Mis Solicitudes Asignadas</h2>
+      <p>Gestión, filtrado y seguimiento de requerimientos de soporte.</p>
+    </div>
+    <button class="btn-primary" (click)="mostrarModalCrear.set(true)">
+      + Nueva Solicitud
+    </button>
+  </div>
+
+  <!-- Barra de Filtros Combinados (HU-03) -->
+  <div class="filters-card">
+    <div class="filter-group">
+      <label for="filtroEstado">Estado:</label>
+      <select 
+        id="filtroEstado" 
+        [ngModel]="filtroEstado()" 
+        (ngModelChange)="filtroEstado.set($event); onFiltroChange()"
+      >
+        <option value="">Todos los estados</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="EnProceso">En Proceso</option>
+        <option value="Resuelta">Resuelta</option>
+        <option value="Cerrada">Cerrada</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filtroPrioridad">Prioridad:</label>
+      <select 
+        id="filtroPrioridad" 
+        [ngModel]="filtroPrioridad()" 
+        (ngModelChange)="filtroPrioridad.set($event); onFiltroChange()"
+      >
+        <option value="">Todas las prioridades</option>
+        <option value="Baja">Baja</option>
+        <option value="Media">Media</option>
+        <option value="Alta">Alta</option>
+      </select>
+    </div>
+
+    @if (filtroEstado() || filtroPrioridad()) {
+      <button class="btn-clear" (click)="limpiarFiltros()">
+        Limpiar Filtros
+      </button>
+    }
+  </div>
+
+  <!-- Mensaje de Error de la API -->
+  @if (errorMessage()) {
+    <div class="alert alert-error">
+      <span class="error-icon">⚠️</span>
+      <div>
+        <strong>Error de Conexión:</strong>
+        <p>{{ errorMessage() }}</p>
+      </div>
+      <button class="btn-retry" (click)="cargarSolicitudes()">Reintentar</button>
+    </div>
+  }
+
+  <!-- Contenedor de la Tabla -->
+  <div class="table-container">
+    @if (isLoading()) {
+      <!-- Indicador Visual de Carga -->
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando tus solicitudes...</p>
+      </div>
+    } @else if (!errorMessage()) {
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Título</th>
+            <th>Cliente</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Fecha Creación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of solicitudes(); track item.id) {
+            <tr>
+              <td><strong>{{ item.codigo }}</strong></td>
+              <td>{{ item.titulo }}</td>
+              <td>{{ item.cliente || 'Sin cliente' }}</td>
+              <td>
+                <span class="badge priority-{{ item.prioridad.toLowerCase() }}">
+                  {{ item.prioridad }}
+                </span>
+              </td>
+              <td>
+                <span class="badge status-{{ item.estado.toLowerCase().replace(' ', '') }}">
+                  {{ item.estado }}
+                </span>
+              </td>
+              <td>{{ item.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <div class="action-buttons">
+                  @if (item.estado === 'Pendiente') {
+                    <button class="btn-action btn-process" (click)="actualizarEstado(item.id, 'EnProceso')">
+                      Iniciar
+                    </button>
+                  }
+                  @if (item.estado === 'EnProceso' || item.estado === 'En Proceso') {
+                    <button class="btn-action btn-resolve" (click)="actualizarEstado(item.id, 'Resuelta')">
+                      Resolver
+                    </button>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <!-- Estado Vacío -->
+            <tr>
+              <td colspan="7" class="empty-state">
+                <div class="empty-content">
+                  <span class="empty-icon">🔍</span>
+                  <p>No se encontraron solicitudes que coincidan con los filtros aplicados.</p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<!-- Modal para Crear Solicitud (HU-02) -->
+<app-crear-solicitud-modal 
+  [isOpen]="mostrarModalCrear()" 
+  (cerrarModal)="mostrarModalCrear.set(false)"
+  (solicitudCreada)="cargarSolicitudes()"
+/>
