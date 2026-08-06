@@ -29,7 +29,8 @@ namespace GestorSolicitudes.Infrastructure.Persistence.Context
                 entity.Property(u => u.Id)
                         .ValueGeneratedOnAdd()
                         .UseIdentityColumn(1, 1);
-                entity.Property(u => u.NombreUsuario).IsRequired().HasMaxLength(50);
+                entity.Property(u => u.NombreUsuario).IsRequired().HasMaxLength(15);
+                entity.Property(u => u.NombreCompleto).HasMaxLength(60).IsRequired();
                 entity.Property(u => u.Email).IsRequired().HasMaxLength(100);
                 entity.Property(u => u.PasswordHash).IsRequired();
                 entity.Property(u => u.Rol)
@@ -62,6 +63,11 @@ namespace GestorSolicitudes.Infrastructure.Persistence.Context
                 entity.Property(s => s.Estado)
                       .HasConversion<string>()
                       .HasMaxLength(20);
+                entity.Property(s => s.FechaCreacion)
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(s => s.FechaCierre)
+                      .IsRequired(false);
 
                 entity.HasOne(s => s.UsuarioResponsable)
                       .WithMany()
@@ -74,6 +80,7 @@ namespace GestorSolicitudes.Infrastructure.Persistence.Context
                 new Usuario
                 {
                     Id = 1,
+                    NombreCompleto = "Administrador del Sistema",
                     NombreUsuario = "admin",
                     Email = "admin@empresa.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
@@ -83,6 +90,7 @@ namespace GestorSolicitudes.Infrastructure.Persistence.Context
                 new Usuario
                 {
                     Id = 2,
+                    NombreCompleto = "Agente de Soporte 1",
                     NombreUsuario = "agente1",
                     Email = "agente1@empresa.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Agente123!"),

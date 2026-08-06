@@ -18,5 +18,8 @@ namespace GestorSolicitudes.Domain.Entities
         public EstadoSolicitud Estado { get; set; }
         public int? UsuarioResponsableId { get; set; }
         public Usuario? UsuarioResponsable { get; set; }
+        
+        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
+        public DateTime? FechaCierre { get; set; }
     }
 }
