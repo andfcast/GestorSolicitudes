@@ -1,0 +1,85 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="cerrar()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Crear Nueva Solicitud</h3>
+        <button type="button" class="btn-close" (click)="cerrar()">✕</button>
+      </div>
+
+      <form [formGroup]="solicitudForm" (ngSubmit)="onSubmit()" class="modal-body">
+        @if (errorMessage()) {
+          <div class="alert alert-danger">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <!-- Título -->
+        <div class="form-group">
+          <label for="titulo">Título / Asunto *</label>
+          <input 
+            id="titulo" 
+            type="text" 
+            formControlName="titulo" 
+            placeholder="Ej. Falla de conexión en servidor"
+            [class.is-invalid]="solicitudForm.controls.titulo.touched && solicitudForm.controls.titulo.invalid"
+          />
+          @if (solicitudForm.controls.titulo.touched && solicitudForm.controls.titulo.errors?.['required']) {
+            <span class="error-text">El título es requerido.</span>
+          }
+        </div>
+
+        <!-- Prioridad -->
+        <div class="form-group">
+          <label for="prioridad">Prioridad *</label>
+          <select id="prioridad" formControlName="prioridad">
+            <option value="Baja">Baja</option>
+            <option value="Media">Media</option>
+            <option value="Alta">Alta</option>
+          </select>
+        </div>
+
+        <!-- Asignar Responsable (Campo exclusivo para Administradores) -->
+        @if (esAdmin) {
+          <div class="form-group">
+            <label for="usuarioResponsableId">Asignar Responsable (Opcional)</label>
+            <select id="usuarioResponsableId" formControlName="usuarioResponsableId">
+              <option [ngValue]="null">-- Dejar sin asignar (Pendiente) --</option>
+              @for (asesor of asesores(); track asesor.id) {
+                <option [value]="asesor.id">{{ asesor.nombreCompleto }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label for="descripcion">Descripción detallada *</label>
+          <textarea 
+            id="descripcion" 
+            rows="4" 
+            formControlName="descripcion" 
+            placeholder="Describe el problema o requerimiento..."
+            [class.is-invalid]="solicitudForm.controls.descripcion.touched && solicitudForm.controls.descripcion.invalid"
+          ></textarea>
+          @if (solicitudForm.controls.descripcion.touched && solicitudForm.controls.descripcion.errors?.['required']) {
+            <span class="error-text">La descripción es requerida.</span>
+          }
+        </div>
+
+        <!-- Footer / Acciones -->
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrar()" [disabled]="isLoading()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span>Guardando...</span>
+            } @else {
+              <span>Crear Solicitud</span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
