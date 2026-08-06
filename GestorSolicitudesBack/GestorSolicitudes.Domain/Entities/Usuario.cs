@@ -1,4 +1,4 @@
-﻿using GestorSolicitudes.Domain.Common;
+﻿using GestorSolicitudes.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace GestorSolicitudes.Domain.Entities
 {
-    public class Usuario : BaseEntity<int>
+    public class Usuario
     {
-        public string Nombre { get; set; } = string.Empty;
+        public int Id { get; set; }
+        public string NombreUsuario { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public int RolId { get; set; }
-        public Rol Rol { get; set; } = null!;
-        public DateTime FechaRegistro { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
+        public RolUsuario Rol { get; set; } = RolUsuario.Agente;
+        public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
     }
 }

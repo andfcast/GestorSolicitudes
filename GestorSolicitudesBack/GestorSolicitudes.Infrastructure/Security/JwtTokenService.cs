@@ -20,7 +20,7 @@ namespace GestorSolicitudes.Infrastructure.Security
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
-            var roleName = u.Rol?.Nombre ?? u.RolId.ToString();
+            var roleName = u.Rol.ToString();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, u.Id.ToString()), new Claim(ClaimTypes.Email, u.Email), new Claim(ClaimTypes.Role, roleName) }),

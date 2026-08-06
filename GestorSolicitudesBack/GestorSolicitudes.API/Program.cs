@@ -43,9 +43,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<ITokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
-builder.Services.AddScoped<IEstadoService, EstadoService>();
 builder.Services.AddScoped<ISolicitudService, SolicitudService>();
 
 builder.Services.AddAuthentication(opt =>

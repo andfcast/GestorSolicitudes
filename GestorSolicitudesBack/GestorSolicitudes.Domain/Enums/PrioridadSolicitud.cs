@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GestorSolicitudes.Domain.Repositories
+namespace GestorSolicitudes.Domain.Enums
 {
-    public interface IRolRepository
+    public enum PrioridadSolicitud
     {
+        Baja = 1,
+        Media = 2,
+        Alta = 3
     }
 }

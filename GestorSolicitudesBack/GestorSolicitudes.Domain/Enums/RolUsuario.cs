@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GestorSolicitudes.Infrastructure.Persistence.Repositories
+namespace GestorSolicitudes.Domain.Enums
 {
-    internal class RolRepository
+    public enum RolUsuario
     {
+        Administrador = 1,
+        Agente = 2
     }
 }
