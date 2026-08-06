@@ -9,6 +9,6 @@ namespace GestorSolicitudes.Application.Services
 {
     public interface ITokenService
     {
-        string GenerateToken(Usuario u);
+        (string Token, DateTime Expiracion) GenerateToken(Usuario u);
     }
 }

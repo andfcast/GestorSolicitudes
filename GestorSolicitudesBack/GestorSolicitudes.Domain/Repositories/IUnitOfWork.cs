@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace GestorSolicitudes.Domain.Repositories
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
+        IUsuarioRepository Usuarios { get; }
+        ISolicitudRepository Solicitudes { get; }
+        Task<int> CompleteAsync();
     }
 }
