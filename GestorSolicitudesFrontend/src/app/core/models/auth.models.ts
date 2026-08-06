@@ -1,13 +1,18 @@
 export interface LoginDto {
-  email: string;
+  usuarioOrEmail: string;
   password: string;
 }
 
-export interface SesionUsuario {
+export interface LoginResponse {
   token: string;
-  mensaje: string;
-  nombre: string;
-  usuarioId: string;
+  nombreUsuario: string;
   email: string;
-  rol: 'Agente' | 'Admin'; 
+  rol: string;
+  expiracion: string;
+}
+
+export interface UserSession {
+  nombreUsuario: string;
+  email: string;
+  rol: string;
 }

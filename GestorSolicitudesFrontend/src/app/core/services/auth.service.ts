@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { LoginDto, SesionUsuario } from '../models/auth.models';
+import { LoginDto, LoginResponse, UserSession } from '../models/auth.models';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 
@@ -12,86 +12,43 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private apiUrl = `${environment.apiUrl}auth`; 
-  private tokenKey = 'eduapoyos_jwt_token';
-  private sessionKey = 'eduapoyos_session';
-  private readonly hasLocalStorage = typeof localStorage !== 'undefined';
+  
 
-  currentUser = signal<SesionUsuario | null>(this.obtenerSesionGuardada());
-  isLoggedIn = computed(() => !!this.currentUser());
-  userRole = computed(() => this.currentUser()?.rol ?? null);
-    
-  login(credentials: LoginDto): Observable<SesionUsuario> {
-    return this.http.post<SesionUsuario>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        if (response?.token) {
-          this.setToken(response.token);          
-        }
-        this.guardarSesion(response);
-        this.currentUser.set(response);
-      
-      // 🚀 Aquí se dispara la navegación dinámica:
-      this.redirigirSegunRol(response.rol);
+  currentUser = signal<UserSession | null>(this.getUserFromStorage());
+
+  login(credentials: LoginDto): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap((response) => {
+        // Guardar token y datos de usuario
+        localStorage.setItem('jwt_token', response.token);
+        const session: UserSession = {
+          nombreUsuario: response.nombreUsuario,
+          email: response.email,
+          rol: response.rol
+        };
+        localStorage.setItem('user_session', JSON.stringify(session));
+        this.currentUser.set(session);
       })
     );
   }
 
-  setToken(token: string): void {
-    if (!this.hasLocalStorage) {
-      return;
-    }
-    localStorage.setItem(this.tokenKey, token);
-  }
-
-  getToken(): string | null {
-    return this.currentUser()?.token ?? null;
-  }
-
-  getUserRole(): 'Agente' | 'Admin' | null {
-    return this.currentUser()?.rol ?? null;
-  }
-
-  getUserId(): string | null {
-    return this.currentUser()?.usuarioId ?? null;
-  }
-
-  esAgente(): boolean {
-    return this.getUserRole() === 'Agente';
-  }
-
-  esAdmin(): boolean {
-    return this.getUserRole() === 'Admin';
-  }
-
   logout(): void {
-    if (this.hasLocalStorage) {
-      localStorage.removeItem(this.sessionKey);
-    }
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('user_session');
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
-  public redirigirSegunRol(rol: string): void {
-    if (rol === 'Asesor') {
-      this.router.navigate(['/dashboard/asesor']);
-    } else if (rol === 'Estudiante') {
-      this.router.navigate(['/dashboard/estudiante']);
-    } else {
-      this.router.navigate(['/login']);
-    }
+  getToken(): string | null {
+    return localStorage.getItem('jwt_token');
   }
 
-  private guardarSesion(session: SesionUsuario): void {
-    if (!this.hasLocalStorage) {
-      return;
-    }
-    localStorage.setItem(this.sessionKey, JSON.stringify(session));
+  isAuthenticated(): boolean {
+    return !!this.getToken();
   }
 
-  private obtenerSesionGuardada(): SesionUsuario | null {
-    if (!this.hasLocalStorage) {
-      return null;
-    }
-    const data = localStorage.getItem(this.sessionKey);
+  private getUserFromStorage(): UserSession | null {
+    const data = localStorage.getItem('user_session');
     return data ? JSON.parse(data) : null;
   }
 
