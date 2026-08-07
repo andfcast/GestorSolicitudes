@@ -5,6 +5,7 @@ import { SolicitudService } from '../../../../core/services/solicitud.service';
 import { CrearSolicitudDto, SolicitudDto } from '../../../../core/models/solicitud.models';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UsuarioOpcion } from '../../../../core/models/basico.models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-crear-solicitud-modal',
@@ -82,30 +83,49 @@ export class CrearSolicitudModal implements OnChanges {
       this.solicitudService.actualizarSolicitud(this.solicitudAEditar.id, payload).subscribe({
         next: () => {
           this.isSaving.set(false);
+          Swal.fire({
+              icon: 'success',              
+              text: `Solicitud actualizada correctamente.`,
+              timer: 3000
+          });
           this.solicitudCreada.emit();
           this.cerrar();
         },
         error: (err) => {
-          console.error('Error al actualizar la solicitud:', err);
           this.isSaving.set(false);
+          Swal.fire({
+              title: 'Error',
+              icon: 'error',
+              timer: 3000,
+              text: 'Ocurrió un error al intentar actualizar la solicitud.'
+          });
           this.errorMessage.set(err.error?.mensaje || 'Ocurrió un error al intentar actualizar la solicitud.');
         }
       });
     } else {
       // HU-02: Petición de creación (POST)
       if(!this.authService.isAdmin()){
-        debugger;
         payload.usuarioResponsableId = this.authService.getUsuarioId()!;
       }
       this.solicitudService.crearSolicitud(payload).subscribe({
         next: () => {
           this.isSaving.set(false);
+          Swal.fire({
+              icon: 'success',              
+              text: `Solicitud creada correctamente.`,
+              timer: 3000
+          });
           this.solicitudCreada.emit();
           this.cerrar();
         },
         error: (err) => {
-          console.error('Error al crear la solicitud:', err);
           this.isSaving.set(false);
+          Swal.fire({
+              title: 'Error',
+              icon: 'error',
+              timer: 3000,
+              text: 'Ocurrió un error al registrar la solicitud.'
+          });
           this.errorMessage.set(err.error?.mensaje || 'Ocurrió un error al registrar la solicitud.');
         }
       });

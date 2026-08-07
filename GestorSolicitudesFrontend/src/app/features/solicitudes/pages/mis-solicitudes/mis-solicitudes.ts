@@ -9,6 +9,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { UsuarioService } from '../../../../core/services/usuario.service';
 import { UsuarioListaDto } from '../../../../core/models/usuario.models';
 import { AsignarUsuarioModal } from "../../components/asignar-usuario-modal/asignar-usuario-modal";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-mis-solicitudes',
@@ -119,13 +120,32 @@ cargarAgentes(): void {
   limpiarFiltros(): void {
     this.filtroEstado.set('');
     this.filtroPrioridad.set('');
+    Swal.fire({
+            icon: 'success',              
+            text: `Filtros limpiados correctamente.`,
+            timer: 3000
+          });
     this.cargarSolicitudes();
   }
 
   actualizarEstado(id: number, nuevoEstado: string): void {
     this.solicitudService.cambiarEstado(id, nuevoEstado).subscribe({
-      next: () => this.cargarSolicitudes(),
-      error: () => alert('Ocurrió un error al actualizar el estado de la solicitud.')
+      next: () => {
+        Swal.fire({
+            icon: 'success',              
+            text: `Estado de la solicitud actualizado correctamente.`,
+            timer: 3000
+        });
+        this.cargarSolicitudes();
+      },
+      error: () => {
+        Swal.fire({
+            title: 'Error',
+            icon: 'error',
+            timer: 3000,
+            text: 'Ocurrió un error al actualizar el estado de la solicitud.'
+        });
+      }
     });
   }
 
@@ -134,13 +154,37 @@ cargarAgentes(): void {
   }
 
   borrarSolicitud(id: number) {
-    this.isLoading.set(true);
-    this.solicitudService.borrarSolicitud(id).subscribe({
-      next: () => {
-        this.cargarSolicitudes();
-        this.isLoading.set(false);
-      },
-      error: () => alert('Ocurrió un error al borrar la solicitud.')
+    Swal.fire({
+      title: "¿Está seguro de eliminar la solicitud?",
+      text: "Esta acción no se puede revertir",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí",
+      cancelButtonText: "No"
+    }).then((result) =>{
+      if(result.isConfirmed){
+        this.isLoading.set(true);
+        this.solicitudService.borrarSolicitud(id).subscribe({
+          next: () => {
+            Swal.fire({
+                icon: 'success',              
+                text: `Solicitud eliminada correctamente.`,
+                timer: 3000
+            });
+            this.cargarSolicitudes();
+            this.isLoading.set(false);
+          },
+          error: () => {
+            Swal.fire({
+                title: 'Error',
+                icon: 'error',
+                timer: 3000,
+                text: 'Ocurrió un error al borrar la solicitud.'
+            });
+          }
+        });
+      }
     });
+    
   }
 }
