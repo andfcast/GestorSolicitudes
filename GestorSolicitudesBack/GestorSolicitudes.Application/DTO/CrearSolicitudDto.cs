@@ -16,6 +16,9 @@ namespace GestorSolicitudes.Application.DTO
         [Required(ErrorMessage = "La descripción es obligatoria.")]
         public string Descripcion { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "El cliente es obligatorio.")]
+        public string Cliente { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "La prioridad es obligatoria.")]
         public string Prioridad { get; set; } = "Media"; // Baja, Media, Alta
 

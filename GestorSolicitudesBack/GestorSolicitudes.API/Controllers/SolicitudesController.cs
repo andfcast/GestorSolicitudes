@@ -19,7 +19,7 @@ namespace GestorSolicitudes.API.Controllers
         {
             _solicitudService = solicitudService;
         }
-
+        [HttpGet("filtro")]
         public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetMisSolicitudes(
             [FromQuery] string? estado = null,
             [FromQuery] string? prioridad = null)

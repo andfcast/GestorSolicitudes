@@ -16,7 +16,7 @@ export class SolicitudService {
     if (estado) params = params.set('estado', estado);
     if (prioridad) params = params.set('prioridad', prioridad);
 
-    return this.http.get<SolicitudDto[]>(`${this.apiUrl}/mis-solicitudes`, { params });
+    return this.http.get<SolicitudDto[]>(`${this.apiUrl}/filtro`, { params });
   }
 
   getDetalleSolicitud(id: number): Observable<SolicitudDto> {

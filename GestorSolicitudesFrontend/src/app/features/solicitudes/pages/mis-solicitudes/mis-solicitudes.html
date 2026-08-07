@@ -5,7 +5,7 @@
       <h2>Mis Solicitudes Asignadas</h2>
       <p>Gestión, filtrado y seguimiento de requerimientos de soporte.</p>
     </div>
-    <button class="btn-primary" (click)="mostrarModalCrear.set(true)">
+    <button class="btn-primary" (click)="abrirCrear()">
       + Nueva Solicitud
     </button>
   </div>
@@ -20,7 +20,7 @@
         (ngModelChange)="filtroEstado.set($event); onFiltroChange()"
       >
         <option value="">Todos los estados</option>
-        <option value="Pendiente">Pendiente</option>
+        <option value="Asignada">Asignada</option>
         <option value="EnProceso">En Proceso</option>
         <option value="Resuelta">Resuelta</option>
         <option value="Cerrada">Cerrada</option>
@@ -103,7 +103,12 @@
                   <button class="btn-action btn-detail" (click)="verDetalle(item.id)">
                     👁️ Ver Detalle
                   </button>
-                  @if (item.estado === 'Pendiente') {
+                   @if (item.estado !== 'Resuelta' && item.estado !== 'Cerrada') {
+                    <button class="btn-action btn-edit" (click)="abrirEditar(item)">
+                    ✏️ Editar
+                    </button>
+                  }                  
+                  @if (item.estado === 'Nueva' || item.estado === 'Asignada') {
                     <button class="btn-action btn-process" (click)="actualizarEstado(item.id, 'EnProceso')">
                       Iniciar
                     </button>
@@ -111,6 +116,11 @@
                   @if (item.estado === 'EnProceso' || item.estado === 'En Proceso') {
                     <button class="btn-action btn-resolve" (click)="actualizarEstado(item.id, 'Resuelta')">
                       Resolver
+                    </button>
+                  }
+                  @if (item.estado === 'Resuelta') {
+                    <button class="btn-action btn-error" (click)="actualizarEstado(item.id, 'Cerrada')">
+                      Cerrar
                     </button>
                   }
                 </div>
@@ -135,7 +145,8 @@
 
 <!-- Modal para Crear Solicitud (HU-02) -->
 <app-crear-solicitud-modal 
-  [isOpen]="mostrarModalCrear()" 
+  [isOpen]="mostrarModalCrear()"
+  [solicitudAEditar]="solicitudAEditar()" 
   (cerrarModal)="mostrarModalCrear.set(false)"
   (solicitudCreada)="cargarSolicitudes()"
 />

@@ -20,6 +20,7 @@ export class MisSolicitudes implements OnInit {
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
   solicitudSeleccionadaId = signal<number | null>(null);
+  solicitudAEditar = signal<SolicitudDto | null>(null);
 
   filtroEstado = signal<string>('');
   filtroPrioridad = signal<string>('');
@@ -58,6 +59,16 @@ export class MisSolicitudes implements OnInit {
   verDetalle(id: number): void {
     this.solicitudSeleccionadaId.set(id);
     this.mostrarModalDetalle.set(true);
+  }
+
+  abrirCrear(): void {
+    this.solicitudAEditar.set(null); // Null indica que es creación
+    this.mostrarModalCrear.set(true);
+  }
+
+  abrirEditar(solicitud: SolicitudDto): void {
+    this.solicitudAEditar.set(solicitud); // Pasa el objeto para edición
+    this.mostrarModalCrear.set(true);
   }
 
   limpiarFiltros(): void {

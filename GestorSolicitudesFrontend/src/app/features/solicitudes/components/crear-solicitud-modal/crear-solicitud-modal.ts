@@ -15,9 +15,9 @@ import { UsuarioOpcion } from '../../../../core/models/basico.models';
 export class CrearSolicitudModal implements OnChanges {
   private fb = inject(FormBuilder);
   private solicitudService = inject(SolicitudService);
-
+  private authService = inject(AuthService);
   @Input() isOpen = false;
-  @Input() solicitudAEditar: SolicitudDto | null = null; // HU-05: Si tiene objeto = Edición, si es null = Creación
+  @Input() solicitudAEditar: SolicitudDto | null = null;
 
   @Output() cerrarModal = new EventEmitter<void>();
   @Output() solicitudCreada = new EventEmitter<void>();
@@ -93,6 +93,9 @@ export class CrearSolicitudModal implements OnChanges {
       });
     } else {
       // HU-02: Petición de creación (POST)
+      if(!this.authService.isAdmin()){
+        payload.usuarioResponsableId = this.authService.getUsuarioId()!;
+      }
       this.solicitudService.crearSolicitud(payload).subscribe({
         next: () => {
           this.isSaving.set(false);

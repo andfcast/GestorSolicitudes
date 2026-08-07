@@ -22,6 +22,7 @@ export class AuthService {
         // Guardar token y datos de usuario
         localStorage.setItem('jwt_token', response.token);
         const session: UserSession = {
+          id: response.id,
           nombreUsuario: response.nombreUsuario,
           email: response.email,
           rol: response.rol
@@ -50,6 +51,25 @@ export class AuthService {
   private getUserFromStorage(): UserSession | null {
     const data = localStorage.getItem('user_session');
     return data ? JSON.parse(data) : null;
+  }
+
+  private getUserSession(): UserSession | null {
+    const data = localStorage.getItem('user_session');
+    return data ? JSON.parse(data) : null;
+  }
+
+  getUsuarioId(): number | null {
+    const session = this.getUserSession();
+    return session?.id ?? null; // Retorna el id guardado en la sesión
+  }
+
+
+  isAdmin(): boolean {
+    const session = this.getUserSession();
+    if (!session || !session.rol) return false;
+
+    const rol = session.rol.toLowerCase();
+    return rol === 'admin' || rol === 'administrador';
   }
 
   
