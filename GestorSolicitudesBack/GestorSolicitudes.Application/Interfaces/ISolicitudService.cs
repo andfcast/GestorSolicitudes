@@ -19,7 +19,7 @@ namespace GestorSolicitudes.Application.Interfaces
 
         Task<IEnumerable<SolicitudDto>> GetSolicitudesConResponsableAsync();
 
-
+        Task<bool> ActualizarSolicitudAsync(int id, ActualizarSolicitudDto dto);
         Task<SolicitudDto> CrearSolicitudAsync(CrearSolicitudDto dto);
 
         Task<bool> CambiarEstadoAsync(int solicitudId, string nuevoEstado);

@@ -4,10 +4,11 @@ import { SolicitudService } from '../../../../core/services/solicitud.service';
 import { Solicitud, SolicitudDto } from '../../../../core/models/solicitud.models';
 import { CrearSolicitudModal } from "../../components/crear-solicitud-modal/crear-solicitud-modal";
 import { FormsModule } from '@angular/forms';
+import { DetalleSolicitudModal } from '../../components/detalle-solicitud-modal/detalle-solicitud-modal';
 
 @Component({
   selector: 'app-mis-solicitudes',
-  imports: [CommonModule, FormsModule, CrearSolicitudModal],
+  imports: [CommonModule, FormsModule, CrearSolicitudModal, DetalleSolicitudModal],
   templateUrl: './mis-solicitudes.html',
   styleUrl: './mis-solicitudes.scss',
 })
@@ -18,13 +19,14 @@ export class MisSolicitudes implements OnInit {
   solicitudes = signal<SolicitudDto[]>([]);
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
+  solicitudSeleccionadaId = signal<number | null>(null);
+  solicitudAEditar = signal<SolicitudDto | null>(null);
 
-  // Filtros Combinados (HU-03)
   filtroEstado = signal<string>('');
   filtroPrioridad = signal<string>('');
 
-  // Control del Modal de Creación (HU-02)
   mostrarModalCrear = signal<boolean>(false);
+  mostrarModalDetalle = signal<boolean>(false);
 
   ngOnInit(): void {
     this.cargarSolicitudes();
@@ -52,6 +54,21 @@ export class MisSolicitudes implements OnInit {
 
   onFiltroChange(): void {
     this.cargarSolicitudes();
+  }
+
+  verDetalle(id: number): void {
+    this.solicitudSeleccionadaId.set(id);
+    this.mostrarModalDetalle.set(true);
+  }
+
+  abrirCrear(): void {
+    this.solicitudAEditar.set(null); // Null indica que es creación
+    this.mostrarModalCrear.set(true);
+  }
+
+  abrirEditar(solicitud: SolicitudDto): void {
+    this.solicitudAEditar.set(solicitud); // Pasa el objeto para edición
+    this.mostrarModalCrear.set(true);
   }
 
   limpiarFiltros(): void {

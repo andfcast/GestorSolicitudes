@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace GestorSolicitudes.Application.DTO
 {
-    public class CrearSolicitudDto
+    public class ActualizarSolicitudDto
     {
         [Required(ErrorMessage = "El título es obligatorio.")]
-        [StringLength(100, ErrorMessage = "El título no puede superar los 100 caracteres.")]
+        [StringLength(150, ErrorMessage = "El título no puede superar los 150 caracteres.")]
         public string Titulo { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La descripción es obligatoria.")]
@@ -20,7 +20,7 @@ namespace GestorSolicitudes.Application.DTO
         public string Cliente { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La prioridad es obligatoria.")]
-        public string Prioridad { get; set; } = "Media"; // Baja, Media, Alta
+        public string Prioridad { get; set; } = string.Empty;
 
         public int? UsuarioResponsableId { get; set; }
     }

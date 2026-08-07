@@ -19,7 +19,7 @@ namespace GestorSolicitudes.API.Controllers
         {
             _solicitudService = solicitudService;
         }
-
+        [HttpGet("filtro")]
         public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetMisSolicitudes(
             [FromQuery] string? estado = null,
             [FromQuery] string? prioridad = null)
@@ -89,6 +89,23 @@ namespace GestorSolicitudes.API.Controllers
             if (!resultado) return BadRequest(new { mensaje = "No se pudo actualizar el estado." });
 
             return Ok(new { mensaje = "Estado actualizado exitosamente." });
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarSolicitudDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var exito = await _solicitudService.ActualizarSolicitudAsync(id, dto);
+            if (!exito)
+            {
+                return NotFound(new { mensaje = $"No se encontró la solicitud con ID {id} para actualizar." });
+            }
+
+            return Ok(new { mensaje = "Solicitud actualizada correctamente." });
         }
 
         // 8. Asignar Responsable

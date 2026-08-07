@@ -24,18 +24,7 @@ namespace GestorSolicitudes.Application.Services
         {
             var solicitudes = await _unitOfWork.Solicitudes.GetByUsuarioResponsableAsync(usuarioId, estado, prioridad);
 
-            return solicitudes.Select(s => new SolicitudDto
-            {
-                Id = s.Id,
-                Codigo = s.Codigo,
-                Titulo = s.Titulo,
-                Descripcion = s.Descripcion,
-                Cliente = s.Cliente,
-                Prioridad = s.Prioridad.ToString(),
-                Estado = s.Estado.ToString(),
-                FechaCreacion = s.FechaCreacion,
-                UsuarioResponsableId = s.UsuarioResponsableId
-            });
+            return solicitudes.Select(s => MapToDto(s));
         }
 
         public async Task<SolicitudDto?> GetByIdAsync(int id)
@@ -63,6 +52,7 @@ namespace GestorSolicitudes.Application.Services
                 Codigo = $"SOL-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..4].ToUpper()}",
                 Titulo = dto.Titulo,
                 Descripcion = dto.Descripcion,
+                Cliente = dto.Cliente,
                 Estado = EstadoSolicitud.Nueva,
                 Prioridad = Enum.Parse<PrioridadSolicitud>(dto.Prioridad, true),
                 FechaCreacion = DateTime.UtcNow,
@@ -97,6 +87,23 @@ namespace GestorSolicitudes.Application.Services
             return false;
         }
 
+        public async Task<bool> ActualizarSolicitudAsync(int id, ActualizarSolicitudDto dto)
+        {
+            var solicitud = await _unitOfWork.Solicitudes.GetByIdAsync(id);
+            if (solicitud == null) return false;
+
+            solicitud.Titulo = dto.Titulo;
+            solicitud.Descripcion = dto.Descripcion;
+            solicitud.Cliente = dto.Cliente;
+            solicitud.Prioridad = Enum.Parse<PrioridadSolicitud>(dto.Prioridad, true);
+            solicitud.UsuarioResponsableId = dto.UsuarioResponsableId;
+
+            _unitOfWork.Solicitudes.Update(solicitud);
+            await _unitOfWork.CompleteAsync();
+
+            return true;
+        }
+
         public async Task<bool> AsignarResponsableAsync(int solicitudId, int usuarioId)
         {
             var solicitud = await _unitOfWork.Solicitudes.GetByIdAsync(solicitudId);
@@ -108,7 +115,7 @@ namespace GestorSolicitudes.Application.Services
             return true;
         }
 
-        private static SolicitudDto MapToDto(Domain.Entities.Solicitud s)
+        private static SolicitudDto MapToDto(Solicitud s)
         {
             return new SolicitudDto
             {
@@ -117,6 +124,8 @@ namespace GestorSolicitudes.Application.Services
                 Titulo = s.Titulo,
                 Descripcion = s.Descripcion,
                 Estado = s.Estado.ToString(),
+                Cliente = s.Cliente,
+                Prioridad = s.Prioridad.ToString(),
                 FechaCreacion = s.FechaCreacion,
                 UsuarioResponsableId = s.UsuarioResponsableId,
                 NombreUsuarioResponsable = s.UsuarioResponsable != null

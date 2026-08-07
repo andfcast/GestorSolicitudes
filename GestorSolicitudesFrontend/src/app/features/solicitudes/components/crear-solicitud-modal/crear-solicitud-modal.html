@@ -1,85 +1,94 @@
 @if (isOpen) {
   <div class="modal-backdrop" (click)="cerrar()">
     <div class="modal-card" (click)="$event.stopPropagation()">
+      
       <div class="modal-header">
-        <h3>Crear Nueva Solicitud</h3>
+        <h3>{{ esEdicion ? 'Editar Solicitud (' + solicitudAEditar?.codigo + ')' : 'Nueva Solicitud' }}</h3>
         <button type="button" class="btn-close" (click)="cerrar()">✕</button>
       </div>
 
-      <form [formGroup]="solicitudForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <form [formGroup]="solicitudForm" (ngSubmit)="guardar()" class="modal-body">
+        
         @if (errorMessage()) {
-          <div class="alert alert-danger">
-            {{ errorMessage() }}
+          <div class="alert alert-error">
+            <span>⚠️ {{ errorMessage() }}</span>
+          </div>
+        }
+
+        @if (esEdicion) {
+          <div class="read-only-info">
+            <small>Número: <strong>{{ solicitudAEditar?.codigo }}</strong></small> | 
+            <small>Fecha Creación: <strong>{{ solicitudAEditar?.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</strong></small>
           </div>
         }
 
         <!-- Título -->
         <div class="form-group">
-          <label for="titulo">Título / Asunto *</label>
+          <label for="titulo">Título *</label>
           <input 
             id="titulo" 
             type="text" 
-            formControlName="titulo" 
-            placeholder="Ej. Falla de conexión en servidor"
-            [class.is-invalid]="solicitudForm.controls.titulo.touched && solicitudForm.controls.titulo.invalid"
+            formControlName="titulo"
+            placeholder="Escribe el título de la solicitud"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('titulo')"
           />
-          @if (solicitudForm.controls.titulo.touched && solicitudForm.controls.titulo.errors?.['required']) {
-            <span class="error-text">El título es requerido.</span>
+          @if (isFieldInvalid('titulo')) {
+            <span class="error-text">El título es requerido y no debe superar 50 caracteres.</span>
+          }
+        </div>
+
+        <!-- Cliente -->
+        <div class="form-group">
+          <label for="cliente">Cliente / Solicitante</label>
+          <input 
+            id="cliente" 
+            type="text" 
+            formControlName="cliente"
+            placeholder="Nombre del cliente"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('cliente')"
+          />
+          @if (isFieldInvalid('cliente')) {
+            <span class="error-text">El cliente es requerido y no debe superar 30 caracteres.</span>
           }
         </div>
 
         <!-- Prioridad -->
         <div class="form-group">
           <label for="prioridad">Prioridad *</label>
-          <select id="prioridad" formControlName="prioridad">
+          <select id="prioridad" formControlName="prioridad" class="form-control">
             <option value="Baja">Baja</option>
             <option value="Media">Media</option>
             <option value="Alta">Alta</option>
           </select>
         </div>
 
-        <!-- Asignar Responsable (Campo exclusivo para Administradores) -->
-        @if (esAdmin) {
-          <div class="form-group">
-            <label for="usuarioResponsableId">Asignar Responsable (Opcional)</label>
-            <select id="usuarioResponsableId" formControlName="usuarioResponsableId">
-              <option [ngValue]="null">-- Dejar sin asignar (Pendiente) --</option>
-              @for (asesor of asesores(); track asesor.id) {
-                <option [value]="asesor.id">{{ asesor.nombreCompleto }}</option>
-              }
-            </select>
-          </div>
-        }
-
         <!-- Descripción -->
         <div class="form-group">
-          <label for="descripcion">Descripción detallada *</label>
+          <label for="descripcion">Descripción *</label>
           <textarea 
             id="descripcion" 
             rows="4" 
-            formControlName="descripcion" 
-            placeholder="Describe el problema o requerimiento..."
-            [class.is-invalid]="solicitudForm.controls.descripcion.touched && solicitudForm.controls.descripcion.invalid"
+            formControlName="descripcion"
+            placeholder="Detalla la solicitud..."
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('descripcion')"
           ></textarea>
-          @if (solicitudForm.controls.descripcion.touched && solicitudForm.controls.descripcion.errors?.['required']) {
-            <span class="error-text">La descripción es requerida.</span>
+          @if (isFieldInvalid('descripcion')) {
+            <span class="error-text">La descripción es requerida y no debe superar 1000 caracteres.</span>
           }
         </div>
 
-        <!-- Footer / Acciones -->
         <div class="modal-footer">
-          <button type="button" class="btn-secondary" (click)="cerrar()" [disabled]="isLoading()">
-            Cancelar
-          </button>
-          <button type="submit" class="btn-primary" [disabled]="isLoading()">
-            @if (isLoading()) {
-              <span>Guardando...</span>
-            } @else {
-              <span>Crear Solicitud</span>
-            }
+          <button type="button" class="btn-secondary" (click)="cerrar()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="isSaving()">
+            {{ isSaving() ? 'Guardando...' : (esEdicion ? 'Guardar Cambios' : 'Crear Solicitud') }}
           </button>
         </div>
+
       </form>
+
     </div>
   </div>
 }

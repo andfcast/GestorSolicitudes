@@ -11,13 +11,17 @@ export class SolicitudService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}solicitudes`;
 
-getMisSolicitudes(estado?: string, prioridad?: string): Observable<SolicitudDto[]> {
+  getMisSolicitudes(estado?: string, prioridad?: string): Observable<SolicitudDto[]> {
     let params = new HttpParams();
     if (estado) params = params.set('estado', estado);
     if (prioridad) params = params.set('prioridad', prioridad);
 
-    return this.http.get<SolicitudDto[]>(`${this.apiUrl}/mis-solicitudes`, { params });
+    return this.http.get<SolicitudDto[]>(`${this.apiUrl}/filtro`, { params });
   }
+
+  getDetalleSolicitud(id: number): Observable<SolicitudDto> {
+    return this.http.get<SolicitudDto>(`${this.apiUrl}/${id}`);
+}
 
   // HU-02: Cambiar estado
   cambiarEstado(id: number, nuevoEstado: string): Observable<{ mensaje: string }> {
@@ -28,4 +32,8 @@ getMisSolicitudes(estado?: string, prioridad?: string): Observable<SolicitudDto[
   crearSolicitud(dto: CrearSolicitudDto): Observable<SolicitudDto> {
     return this.http.post<SolicitudDto>(this.apiUrl, dto);
   }
+
+  actualizarSolicitud(id: number, dto: Partial<CrearSolicitudDto>): Observable<{ mensaje: string }> {
+    return this.http.put<{ mensaje: string }>(`${this.apiUrl}/${id}`, dto);
+ }
 }

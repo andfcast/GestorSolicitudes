@@ -5,6 +5,7 @@ export interface LoginDto {
 
 export interface LoginResponse {
   token: string;
+  id: number;
   nombreUsuario: string;
   email: string;
   rol: string;
@@ -12,6 +13,7 @@ export interface LoginResponse {
 }
 
 export interface UserSession {
+  id: number;
   nombreUsuario: string;
   email: string;
   rol: string;
