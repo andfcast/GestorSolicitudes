@@ -20,8 +20,14 @@ namespace GestorSolicitudes.API.Controllers
             _solicitudService = solicitudService;
         }
 
+        /// <summary>
+        /// Obtiene las solicitudes asignadas al usuario autenticado, con la opción de filtrar por estado y prioridad.
+        /// </summary>
+        /// <param name="estado"></param>
+        /// <param name="prioridad"></param>
+        /// <returns></returns>
         [HttpGet("filtro")]
-        public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetMisSolicitudes(
+        public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetByUsuario(
             [FromQuery] string? estado = null,
             [FromQuery] string? prioridad = null)
         {
@@ -37,15 +43,11 @@ namespace GestorSolicitudes.API.Controllers
             return Ok(solicitudes);
         }
 
-        // 2. Consulta por ID del usuario
-        [HttpGet("usuario/{usuarioId:int}")]
-        public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetByUsuario(int usuarioId)
-        {
-            var solicitudes = await _solicitudService.GetByUsuarioResponsableAsync(usuarioId);
-            return Ok(solicitudes);
-        }
-
-        // 3. Consulta por ID de solicitud
+        /// <summary>
+        /// Obtiene una solicitud por su ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<SolicitudDto>> GetById(int id)
         {
@@ -54,7 +56,11 @@ namespace GestorSolicitudes.API.Controllers
             return Ok(solicitud);
         }
 
-        // 4. Búsqueda por código único (ej: SOL-20260806-A1B2)
+        /// <summary>
+        /// Obtiene una solicitud por su código.
+        /// </summary>
+        /// <param name="codigo"></param>
+        /// <returns></returns>
         [HttpGet("codigo/{codigo}")]
         public async Task<ActionResult<SolicitudDto>> GetByCodigo(string codigo)
         {
@@ -66,9 +72,15 @@ namespace GestorSolicitudes.API.Controllers
             return Ok(solicitud);
         }
 
-        // 5. Lista General con datos del Responsable (Vista Administrador)
+        /// <summary>
+        /// Obtiene todas las solicitudes con datos del responsable, con la opción de filtrar por estado y prioridad. Solo accesible para administradores.
+        /// </summary>
+        /// <param name="estado"></param>
+        /// <param name="prioridad"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Administrador")]
         [HttpGet("todas")]
-        public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetSolicitudesConResponsable(
+        public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetTodas(
             [FromQuery] string? estado = null,
             [FromQuery] string? prioridad = null)
         {
@@ -76,7 +88,11 @@ namespace GestorSolicitudes.API.Controllers
             return Ok(solicitudes);
         }
 
-        // 6. Crear Solicitud
+        /// <summary>
+        /// Crea una nueva solicitud. El código de la solicitud se genera automáticamente y es único.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<SolicitudDto>> Crear([FromBody] CrearSolicitudDto request)
         {
@@ -84,7 +100,12 @@ namespace GestorSolicitudes.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = nuevaSolicitud.Id }, nuevaSolicitud);
         }
 
-        // 7. Cambiar Estado (Pendiente -> EnProceso -> Resuelta)
+        /// <summary>
+        /// Cambia el estado de una solicitud existente.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPatch("{id:int}/estado")]
         public async Task<IActionResult> CambiarEstado(int id, [FromBody] ActualizarEstadoDto request)
         {
@@ -94,6 +115,12 @@ namespace GestorSolicitudes.API.Controllers
             return Ok(new { mensaje = "Estado actualizado exitosamente." });
         }
 
+        /// <summary>
+        /// Actualiza los detalles de una solicitud existente.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarSolicitudDto dto)
         {
@@ -105,13 +132,19 @@ namespace GestorSolicitudes.API.Controllers
             var exito = await _solicitudService.ActualizarSolicitudAsync(id, dto);
             if (!exito)
             {
-                return NotFound(new { mensaje = $"No se encontró la solicitud con ID {id} para actualizar." });
+                return NotFound(new { mensaje = $"No se encontró la solicitud con el ID consultado para actualizar." });
             }
 
             return Ok(new { mensaje = "Solicitud actualizada correctamente." });
         }
 
-        // 8. Asignar Responsable
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="usuarioId"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Administrador")]
         [HttpPatch("{id:int}/asignar/{usuarioId:int}")]
         public async Task<IActionResult> AsignarResponsable(int id, int usuarioId)
         {
@@ -121,6 +154,12 @@ namespace GestorSolicitudes.API.Controllers
             return Ok(new { mensaje = "Responsable asignado exitosamente." });
         }
 
+        /// <summary>
+        /// Elimina una solicitud existente. Solo accesible para administradores.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Administrador")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Eliminar(int id)
         {

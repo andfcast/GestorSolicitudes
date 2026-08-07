@@ -96,6 +96,26 @@ namespace GestorSolicitudes.Infrastructure.Persistence.Context
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Agente123!"),
                     Rol = RolUsuario.Agente, 
                     FechaCreacion = DateTime.UtcNow
+                },
+                new Usuario
+                {
+                    Id = 3,
+                    NombreCompleto = "Agente de Soporte 2",
+                    NombreUsuario = "agente2",
+                    Email = "agente2@empresa.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Agente123!"),
+                    Rol = RolUsuario.Agente,
+                    FechaCreacion = DateTime.UtcNow
+                },
+                new Usuario
+                {
+                    Id = 4,
+                    NombreCompleto = "Agente de Soporte 3",
+                    NombreUsuario = "agente3",
+                    Email = "agente3@empresa.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Agente123!"),
+                    Rol = RolUsuario.Agente,
+                    FechaCreacion = DateTime.UtcNow
                 }
             );
         }

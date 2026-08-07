@@ -19,7 +19,7 @@ export class SolicitudService {
     return this.http.get<SolicitudDto[]>(`${this.apiUrl}/filtro`, { params });
   }
 
-    getTodasSolicitudes(estado?: string, prioridad?: string): Observable<SolicitudDto[]> {
+  getTodasSolicitudes(estado?: string, prioridad?: string): Observable<SolicitudDto[]> {
     let params = new HttpParams();
     if (estado) params = params.set('estado', estado);
     if (prioridad) params = params.set('prioridad', prioridad);
@@ -29,27 +29,25 @@ export class SolicitudService {
 
   getDetalleSolicitud(id: number): Observable<SolicitudDto> {
     return this.http.get<SolicitudDto>(`${this.apiUrl}/${id}`);
-}
+  }
 
-  // HU-02: Cambiar estado
   cambiarEstado(id: number, nuevoEstado: string): Observable<{ mensaje: string }> {
     return this.http.patch<{ mensaje: string }>(`${this.apiUrl}/${id}/estado`, { nuevoEstado });
   }
 
-  // HU-02: Crear solicitud
   crearSolicitud(dto: CrearSolicitudDto): Observable<SolicitudDto> {
     return this.http.post<SolicitudDto>(this.apiUrl, dto);
   }
 
   actualizarSolicitud(id: number, dto: Partial<CrearSolicitudDto>): Observable<{ mensaje: string }> {
     return this.http.put<{ mensaje: string }>(`${this.apiUrl}/${id}`, dto);
- }
+  }
 
- asignarResponsable(id: number, usuarioResponsableId: number): Observable<{ mensaje: string }> {
+  asignarResponsable(id: number, usuarioResponsableId: number): Observable<{ mensaje: string }> {
     return this.http.patch<{ mensaje: string }>(`${this.apiUrl}/${id}/asignar/${usuarioResponsableId}`, {});
   }
 
- borrarSolicitud(id: number): Observable<{ mensaje: string }> {
+  borrarSolicitud(id: number): Observable<{ mensaje: string }> {
     return this.http.delete<{ mensaje: string }>(`${this.apiUrl}/${id}`);
   }
 }

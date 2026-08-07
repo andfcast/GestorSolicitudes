@@ -10,8 +10,6 @@ namespace GestorSolicitudes.Application.Interfaces
     public interface ISolicitudService
     {
         Task<IEnumerable<SolicitudDto>> GetByUsuarioResponsableAsync(int usuarioId, string? estado = null, string? prioridad = null);
-
-
         Task<SolicitudDto?> GetByIdAsync(int id);
 
         Task<SolicitudDto?> GetByCodigoAsync(string codigo);

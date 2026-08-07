@@ -15,6 +15,12 @@ namespace GestorSolicitudes.API.Controllers
         public UsuariosController(IUsuarioService usuarioService) {
             _usuarioService = usuarioService;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nombre"></param>
+        /// <param name="rol"></param>
+        /// <returns></returns>
         [HttpGet("filtro")]
         public async Task<ActionResult<IEnumerable<UsuarioDto>>> Filtro(
             [FromQuery] string? nombre = null,
