@@ -20,12 +20,13 @@ export interface SolicitudDto {
   fechaCreacion: string;
   fechaCierre?: string;
   usuarioResponsableId?: number;
-  NombreUsuarioResponsable?: string;
+  nombreUsuarioResponsable?: string;
 }
 
 export interface CrearSolicitudDto {
   titulo: string;
   descripcion: string;
+  cliente: string;
   prioridad: string;
   usuarioResponsableId?: number;
 }

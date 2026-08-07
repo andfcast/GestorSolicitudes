@@ -1,1 +1,74 @@
-<p>detalle-solicitud-modal works!</p>
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="cerrar()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      
+      <div class="modal-header">
+        <h3>Detalle de Solicitud</h3>
+        <button type="button" class="btn-close" (click)="cerrar()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        @if (isLoading()) {
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Cargando información del requerimiento...</p>
+          </div>
+        } @else if (errorMessage()) {
+          <div class="alert alert-error">
+            <span class="icon">⚠️</span>
+            <p>{{ errorMessage() }}</p>
+          </div>
+        } @else if (detalle()) {
+          <!-- Ficha de Información Completa -->
+          <div class="header-info">
+            <span class="codigo-tag">{{ detalle()?.codigo }}</span>
+            <h4>{{ detalle()?.titulo }}</h4>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Cliente / Solicitante:</span>
+              <strong>{{ detalle()?.cliente }}</strong>
+            </div>
+            <div class="info-item">
+              <span class="label">Responsable Asignado:</span>
+              <strong>{{ detalle()?.nombreUsuarioResponsable }}</strong>
+            </div>
+            <div class="info-item">
+              <span class="label">Prioridad:</span>
+              <span class="badge priority-{{ detalle()?.prioridad?.toLowerCase() }}">
+                {{ detalle()?.prioridad }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">Estado Actual:</span>
+              <span class="badge status-{{ detalle()?.estado?.toLowerCase()?.replace(' ', '') }}">
+                {{ detalle()?.estado }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">Fecha de Creación:</span>
+              <span>{{ detalle()?.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Fecha de Cierre:</span>
+              <span>
+                {{ detalle()?.fechaCierre ? (detalle()?.fechaCierre | date:'dd/MM/yyyy HH:mm') : 'Pendiente de cierre' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="description-box">
+            <span class="label">Descripción Completa:</span>
+            <p>{{ detalle()?.descripcion }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" (click)="cerrar()">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+}

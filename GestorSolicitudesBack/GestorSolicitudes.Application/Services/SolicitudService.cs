@@ -97,6 +97,22 @@ namespace GestorSolicitudes.Application.Services
             return false;
         }
 
+        public async Task<bool> ActualizarSolicitudAsync(int id, ActualizarSolicitudDto dto)
+        {
+            var solicitud = await _unitOfWork.Solicitudes.GetByIdAsync(id);
+            if (solicitud == null) return false;
+
+            solicitud.Titulo = dto.Titulo;
+            solicitud.Descripcion = dto.Descripcion;
+            solicitud.Prioridad = Enum.Parse<PrioridadSolicitud>(dto.Prioridad, true);
+            solicitud.UsuarioResponsableId = dto.UsuarioResponsableId;
+
+            _unitOfWork.Solicitudes.Update(solicitud);
+            await _unitOfWork.CompleteAsync();
+
+            return true;
+        }
+
         public async Task<bool> AsignarResponsableAsync(int solicitudId, int usuarioId)
         {
             var solicitud = await _unitOfWork.Solicitudes.GetByIdAsync(solicitudId);
@@ -108,7 +124,7 @@ namespace GestorSolicitudes.Application.Services
             return true;
         }
 
-        private static SolicitudDto MapToDto(Domain.Entities.Solicitud s)
+        private static SolicitudDto MapToDto(Solicitud s)
         {
             return new SolicitudDto
             {

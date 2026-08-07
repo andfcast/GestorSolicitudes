@@ -91,6 +91,23 @@ namespace GestorSolicitudes.API.Controllers
             return Ok(new { mensaje = "Estado actualizado exitosamente." });
         }
 
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Actualizar(int id, [FromBody] ActualizarSolicitudDto dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var exito = await _solicitudService.ActualizarSolicitudAsync(id, dto);
+            if (!exito)
+            {
+                return NotFound(new { mensaje = $"No se encontró la solicitud con ID {id} para actualizar." });
+            }
+
+            return Ok(new { mensaje = "Solicitud actualizada correctamente." });
+        }
+
         // 8. Asignar Responsable
         [HttpPatch("{id:int}/asignar/{usuarioId:int}")]
         public async Task<IActionResult> AsignarResponsable(int id, int usuarioId)

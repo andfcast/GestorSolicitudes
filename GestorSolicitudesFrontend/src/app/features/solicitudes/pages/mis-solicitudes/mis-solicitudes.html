@@ -100,6 +100,9 @@
               <td>{{ item.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>
                 <div class="action-buttons">
+                  <button class="btn-action btn-detail" (click)="verDetalle(item.id)">
+                    👁️ Ver Detalle
+                  </button>
                   @if (item.estado === 'Pendiente') {
                     <button class="btn-action btn-process" (click)="actualizarEstado(item.id, 'EnProceso')">
                       Iniciar
@@ -135,4 +138,10 @@
   [isOpen]="mostrarModalCrear()" 
   (cerrarModal)="mostrarModalCrear.set(false)"
   (solicitudCreada)="cargarSolicitudes()"
+/>
+
+<app-detalle-solicitud-modal
+  [isOpen]="mostrarModalDetalle()"
+  [solicitudId]="solicitudSeleccionadaId()"
+  (cerrarModal)="mostrarModalDetalle.set(false)"
 />
