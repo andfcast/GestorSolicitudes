@@ -1,4 +1,5 @@
 ﻿using GestorSolicitudes.Domain.Entities;
+using GestorSolicitudes.Domain.Enums;
 using GestorSolicitudes.Domain.Repositories;
 using GestorSolicitudes.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,27 @@ namespace GestorSolicitudes.Infrastructure.Persistence.Repositories
         {
             return await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.NombreUsuario == usuarioOrEmail || u.Email == usuarioOrEmail);
+        }
+
+        public async Task<IEnumerable<Usuario>> GetUsuariosAsync(string? nombre, string? rol)
+        {
+            var query = _context.Usuarios.AsQueryable();
+
+            // Filtro dinámico por Nombre
+            if (!string.IsNullOrWhiteSpace(nombre))
+            {
+                query = query.Where(u => u.NombreCompleto.Contains(nombre));
+            }
+
+            // Filtro dinámico por Rol
+            if (!string.IsNullOrWhiteSpace(rol) && Enum.TryParse<RolUsuario>(rol, true, out var rolEnum))
+            {
+                query = query.Where(u => u.Rol == rolEnum);
+            }
+
+            return await query
+                .OrderBy(s => s.NombreCompleto)
+                .ToListAsync();
         }
     }
 }

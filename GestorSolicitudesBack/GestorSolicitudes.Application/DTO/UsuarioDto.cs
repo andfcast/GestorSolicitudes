@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace GestorSolicitudes.Application.DTO
 {
-    internal class UsuarioDto
+    public class UsuarioDto
     {
+        public int Id { get; set; }
+        public string NombreCompleto { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Rol { get; set; } = string.Empty;
     }
 }

@@ -18,6 +18,6 @@ namespace GestorSolicitudes.Application.DTO
         public string NombreUsuarioResponsable { get; set; } = string.Empty;
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaCierre { get; set; }
-        public int? UsuarioResponsableId { get; internal set; }
+        public int? UsuarioResponsableId { get; set; }
     }
 }

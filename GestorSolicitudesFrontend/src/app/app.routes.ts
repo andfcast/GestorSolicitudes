@@ -17,6 +17,11 @@ export const routes: Routes = [
         canActivate: [roleGuard(['Agente'])],
         loadComponent: () => import('./features/solicitudes/pages/mis-solicitudes/mis-solicitudes').then(m => m.MisSolicitudes)
       },
+      {
+        path: 'solicitudes',
+        canActivate: [roleGuard(['Administrador'])],
+        loadComponent: () => import('./features/solicitudes/pages/mis-solicitudes/mis-solicitudes').then(m => m.MisSolicitudes)
+      },
       { path: '', redirectTo: 'mis-solicitudes', pathMatch: 'full' }
     ]
   },

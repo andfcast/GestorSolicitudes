@@ -39,9 +39,9 @@ namespace GestorSolicitudes.Application.Services
             return solicitud == null ? null : MapToDto(solicitud);
         }
 
-        public async Task<IEnumerable<SolicitudDto>> GetSolicitudesConResponsableAsync()
+        public async Task<IEnumerable<SolicitudDto>> GetSolicitudesConResponsableAsync(string? estado = null, string? prioridad = null)
         {
-            var solicitudes = await _unitOfWork.Solicitudes.GetSolicitudesConResponsableAsync();
+            var solicitudes = await _unitOfWork.Solicitudes.GetSolicitudesConResponsableAsync(estado, prioridad);
             return solicitudes.Select(MapToDto);
         }
 
@@ -53,7 +53,7 @@ namespace GestorSolicitudes.Application.Services
                 Titulo = dto.Titulo,
                 Descripcion = dto.Descripcion,
                 Cliente = dto.Cliente,
-                Estado = EstadoSolicitud.Nueva,
+                Estado = dto.UsuarioResponsableId.HasValue ? EstadoSolicitud.Asignada : EstadoSolicitud.Nueva,
                 Prioridad = Enum.Parse<PrioridadSolicitud>(dto.Prioridad, true),
                 FechaCreacion = DateTime.UtcNow,
                 UsuarioResponsableId = dto.UsuarioResponsableId
@@ -110,6 +110,7 @@ namespace GestorSolicitudes.Application.Services
             if (solicitud == null) return false;
 
             solicitud.UsuarioResponsableId = usuarioId;
+            solicitud.Estado = EstadoSolicitud.Asignada;
             _unitOfWork.Solicitudes.Update(solicitud);
             await _unitOfWork.CompleteAsync();
             return true;
@@ -132,6 +133,16 @@ namespace GestorSolicitudes.Application.Services
                     ? s.UsuarioResponsable.NombreCompleto
                     : "Sin asignar"
             };
+        }
+
+        public async Task<bool> EliminarSolicitudAsync(int id)
+        {
+            var solicitud = await _unitOfWork.Solicitudes.GetByIdAsync(id);
+            if (solicitud == null) return false;
+
+            _unitOfWork.Solicitudes.Remove(solicitud);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 }

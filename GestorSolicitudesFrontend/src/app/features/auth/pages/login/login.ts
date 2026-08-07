@@ -36,10 +36,10 @@ export class Login {
       next: (response) => {
         debugger;
         this.isLoading.set(false);
-        if (response.rol === 'Agente' || response.rol === 'Asesor') {
+        if (response.rol === 'Agente') {
           this.router.navigate(['/dashboard/mis-solicitudes']);
         } else if (response.rol === 'Administrador') {
-          this.router.navigate(['/dashboard/todas-solicitudes']);
+          this.router.navigate(['/dashboard/solicitudes']);
         }
       },
       error: (err) => {

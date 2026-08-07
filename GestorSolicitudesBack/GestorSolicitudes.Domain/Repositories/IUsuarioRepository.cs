@@ -10,5 +10,6 @@ namespace GestorSolicitudes.Domain.Repositories
     public interface IUsuarioRepository : IRepository<Usuario>
     {
         Task<Usuario?> GetByUsuarioOrEmailAsync(string usuarioOrEmail);
+        Task<IEnumerable<Usuario>> GetUsuariosAsync(string? nombre, string? rol);
     }
 }
