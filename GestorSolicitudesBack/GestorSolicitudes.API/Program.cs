@@ -1,4 +1,3 @@
-using GestorSolicitudes.API.Middlewares;
 using GestorSolicitudes.Application.Interfaces;
 using GestorSolicitudes.Application.Services;
 using GestorSolicitudes.Domain.Repositories;
