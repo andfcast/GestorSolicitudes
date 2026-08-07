@@ -1,5 +1,6 @@
 ﻿using GestorSolicitudes.Application.DTO;
 using GestorSolicitudes.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -7,6 +8,7 @@ using System.Security.Claims;
 
 namespace GestorSolicitudes.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsuariosController : ControllerBase
@@ -15,12 +17,14 @@ namespace GestorSolicitudes.API.Controllers
         public UsuariosController(IUsuarioService usuarioService) {
             _usuarioService = usuarioService;
         }
+
         /// <summary>
-        /// 
+        /// Obtiene una lista de usuarios filtrados por nombre y rol.
         /// </summary>
         /// <param name="nombre"></param>
         /// <param name="rol"></param>
         /// <returns></returns>
+        [Authorize(Roles = "Administrador")]
         [HttpGet("filtro")]
         public async Task<ActionResult<IEnumerable<UsuarioDto>>> Filtro(
             [FromQuery] string? nombre = null,
