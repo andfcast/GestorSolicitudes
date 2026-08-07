@@ -1,0 +1,37 @@
+@if (isOpen) {
+      <div class="modal-backdrop" (click)="cerrar()">
+        <div class="modal-card modal-sm" (click)="$event.stopPropagation()">
+          
+          <div class="modal-header">
+            <h3>Asignar Responsable</h3>
+            <button type="button" class="btn-close" (click)="cerrar()">✕</button>
+          </div>
+
+          <div class="modal-body">
+            @if (solicitud) {
+              <p class="info-solicitud">
+                Solicitud: <strong>{{ solicitud.codigo }}</strong> - {{ solicitud.titulo }}
+              </p>
+            }
+
+            <div class="form-group">
+              <label for="responsable">Seleccionar Agente:</label>
+              <select id="responsable" [(ngModel)]="usuarioSeleccionadoId" class="form-control">
+                <option [value]="null">-- Seleccione un responsable --</option>
+                @for (agente of listaAgentes; track agente.id) {
+                  <option [value]="agente.id">{{ agente.nombreCompleto }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn-secondary" (click)="cerrar()">Cancelar</button>
+            <button type="button" class="btn-primary" [disabled]="!usuarioSeleccionadoId || isSaving()" (click)="guardarAsignacion()">
+              {{ isSaving() ? 'Asignando...' : 'Confirmar Asignación' }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }

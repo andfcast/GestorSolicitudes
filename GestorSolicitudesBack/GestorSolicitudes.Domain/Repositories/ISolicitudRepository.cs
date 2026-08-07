@@ -10,7 +10,7 @@ namespace GestorSolicitudes.Domain.Repositories
     public interface ISolicitudRepository : IRepository<Solicitud>
     {
         Task<Solicitud?> GetByCodigoAsync(string codigo);
-        Task<IEnumerable<Solicitud>> GetSolicitudesConResponsableAsync();
+        Task<IEnumerable<Solicitud>> GetSolicitudesConResponsableAsync(string? estado = null, string? prioridad = null);
         Task<IEnumerable<Solicitud>> GetByUsuarioResponsableAsync(int usuarioId, string? estado = null, string? prioridad = null);
         Task<Solicitud?> GetByIdWithDetailsAsync(int id);
     }

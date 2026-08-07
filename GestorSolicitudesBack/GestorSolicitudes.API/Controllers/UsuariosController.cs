@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GestorSolicitudes.Application.DTO;
+using GestorSolicitudes.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +11,25 @@ namespace GestorSolicitudes.API.Controllers
     [ApiController]
     public class UsuariosController : ControllerBase
     {
-        // GET: api/<UsuarioController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
+        private readonly IUsuarioService _usuarioService;
+        public UsuariosController(IUsuarioService usuarioService) {
+            _usuarioService = usuarioService;
         }
-
-        // GET api/<UsuarioController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("filtro")]
+        public async Task<ActionResult<IEnumerable<UsuarioDto>>> Filtro(
+            [FromQuery] string? nombre = null,
+            [FromQuery] string? rol = null)
         {
-            return "value";
-        }
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                              ?? User.FindFirst("sub")?.Value;
 
-        // POST api/<UsuarioController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int usuarioId))
+            {
+                return Unauthorized(new { mensaje = "Token inválido o usuario no identificado." });
+            }
 
-        // PUT api/<UsuarioController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<UsuarioController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var solicitudes = await _usuarioService.GetUsuarios(nombre, rol);
+            return Ok(solicitudes);
         }
     }
 }

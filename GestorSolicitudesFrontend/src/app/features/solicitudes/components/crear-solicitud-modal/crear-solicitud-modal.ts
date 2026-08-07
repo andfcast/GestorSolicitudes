@@ -94,6 +94,7 @@ export class CrearSolicitudModal implements OnChanges {
     } else {
       // HU-02: Petición de creación (POST)
       if(!this.authService.isAdmin()){
+        debugger;
         payload.usuarioResponsableId = this.authService.getUsuarioId()!;
       }
       this.solicitudService.crearSolicitud(payload).subscribe({

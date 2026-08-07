@@ -19,6 +19,7 @@ namespace GestorSolicitudes.API.Controllers
         {
             _solicitudService = solicitudService;
         }
+
         [HttpGet("filtro")]
         public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetMisSolicitudes(
             [FromQuery] string? estado = null,
@@ -66,10 +67,12 @@ namespace GestorSolicitudes.API.Controllers
         }
 
         // 5. Lista General con datos del Responsable (Vista Administrador)
-        [HttpGet("con-responsable")]
-        public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetSolicitudesConResponsable()
+        [HttpGet("todas")]
+        public async Task<ActionResult<IEnumerable<SolicitudDto>>> GetSolicitudesConResponsable(
+            [FromQuery] string? estado = null,
+            [FromQuery] string? prioridad = null)
         {
-            var solicitudes = await _solicitudService.GetSolicitudesConResponsableAsync();
+            var solicitudes = await _solicitudService.GetSolicitudesConResponsableAsync(estado, prioridad);
             return Ok(solicitudes);
         }
 
@@ -116,6 +119,15 @@ namespace GestorSolicitudes.API.Controllers
             if (!resultado) return BadRequest(new { mensaje = "No se pudo asignar el responsable." });
 
             return Ok(new { mensaje = "Responsable asignado exitosamente." });
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Eliminar(int id)
+        {
+            var resultado = await _solicitudService.EliminarSolicitudAsync(id);
+            if (!resultado) return NotFound(new { mensaje = $"No se encontró la solicitud con el ID indicado para eliminar." });
+
+            return Ok(new { mensaje = "Solicitud eliminada correctamente." });
         }
     }
 }

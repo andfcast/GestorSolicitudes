@@ -5,15 +5,22 @@ import { Solicitud, SolicitudDto } from '../../../../core/models/solicitud.model
 import { CrearSolicitudModal } from "../../components/crear-solicitud-modal/crear-solicitud-modal";
 import { FormsModule } from '@angular/forms';
 import { DetalleSolicitudModal } from '../../components/detalle-solicitud-modal/detalle-solicitud-modal';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UsuarioService } from '../../../../core/services/usuario.service';
+import { UsuarioListaDto } from '../../../../core/models/usuario.models';
+import { AsignarUsuarioModal } from "../../components/asignar-usuario-modal/asignar-usuario-modal";
 
 @Component({
   selector: 'app-mis-solicitudes',
-  imports: [CommonModule, FormsModule, CrearSolicitudModal, DetalleSolicitudModal],
+  imports: [CommonModule, FormsModule, CrearSolicitudModal, DetalleSolicitudModal, AsignarUsuarioModal],
   templateUrl: './mis-solicitudes.html',
   styleUrl: './mis-solicitudes.scss',
 })
 export class MisSolicitudes implements OnInit {
+
   private solicitudService = inject(SolicitudService);
+  private usuarioService = inject(UsuarioService);
+  authService = inject(AuthService);
 
   // Estados Reactivos con Signals
   solicitudes = signal<SolicitudDto[]>([]);
@@ -28,8 +35,15 @@ export class MisSolicitudes implements OnInit {
   mostrarModalCrear = signal<boolean>(false);
   mostrarModalDetalle = signal<boolean>(false);
 
+  mostrarModalAsignar = signal<boolean>(false);
+  solicitudParaAsignar = signal<SolicitudDto | null>(null);
+  listaAgentes = signal<UsuarioListaDto[]>([]);
+
   ngOnInit(): void {
     this.cargarSolicitudes();
+    if(this.authService.isAdmin()) {
+      this.cargarAgentes();
+    }
   }
 
   cargarSolicitudes(): void {
@@ -38,19 +52,40 @@ export class MisSolicitudes implements OnInit {
 
     const estado = this.filtroEstado() || undefined;
     const prioridad = this.filtroPrioridad() || undefined;
-
-    this.solicitudService.getMisSolicitudes(estado, prioridad).subscribe({
-      next: (data) => {
-        this.solicitudes.set(data);
-        this.isLoading.set(false);
-      },
-      error: (err) => {
-        console.error('Error al cargar solicitudes:', err);
-        this.errorMessage.set('No se pudo conectar con el servidor para obtener el listado de solicitudes.');
-        this.isLoading.set(false);
-      }
-    });
+    if(!this.authService.isAdmin()) {
+      this.solicitudService.getMisSolicitudes(estado, prioridad).subscribe({
+        next: (data) => {
+          this.solicitudes.set(data);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Error al cargar solicitudes:', err);
+          this.errorMessage.set('No se pudo conectar con el servidor para obtener el listado de solicitudes.');
+          this.isLoading.set(false);
+        }
+      });
+    }
+    else{
+      this.solicitudService.getTodasSolicitudes(estado, prioridad).subscribe({
+        next: (data) => {
+          this.solicitudes.set(data);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          console.error('Error al cargar solicitudes:', err);
+          this.errorMessage.set('No se pudo conectar con el servidor para obtener el listado de solicitudes.');
+          this.isLoading.set(false);
+        }
+      });
+    }        
   }
+
+cargarAgentes(): void {
+  this.usuarioService.getTodosUsuarios('','Agente').subscribe({
+    next: (agentes) => this.listaAgentes.set(agentes),
+    error: (err) => console.error('Error al cargar agentes', err)
+  });
+}
 
   onFiltroChange(): void {
     this.cargarSolicitudes();
@@ -71,6 +106,16 @@ export class MisSolicitudes implements OnInit {
     this.mostrarModalCrear.set(true);
   }
 
+  abrirModalAsignar(solicitud: SolicitudDto): void {
+    this.solicitudParaAsignar.set(solicitud);
+    this.mostrarModalAsignar.set(true);
+  }
+
+  cerrarModalAsignar(): void {
+    this.mostrarModalAsignar.set(false);
+    this.solicitudParaAsignar.set(null);
+}
+
   limpiarFiltros(): void {
     this.filtroEstado.set('');
     this.filtroPrioridad.set('');
@@ -81,6 +126,21 @@ export class MisSolicitudes implements OnInit {
     this.solicitudService.cambiarEstado(id, nuevoEstado).subscribe({
       next: () => this.cargarSolicitudes(),
       error: () => alert('Ocurrió un error al actualizar el estado de la solicitud.')
+    });
+  }
+
+  asignarSolicitud(id: number): void {
+    this.actualizarEstado(id, 'Asignada');
+  }
+
+  borrarSolicitud(id: number) {
+    this.isLoading.set(true);
+    this.solicitudService.borrarSolicitud(id).subscribe({
+      next: () => {
+        this.cargarSolicitudes();
+        this.isLoading.set(false);
+      },
+      error: () => alert('Ocurrió un error al borrar la solicitud.')
     });
   }
 }

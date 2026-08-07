@@ -22,10 +22,26 @@ namespace GestorSolicitudes.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(s => s.Codigo == codigo);
         }
 
-        public async Task<IEnumerable<Solicitud>> GetSolicitudesConResponsableAsync()
+        public async Task<IEnumerable<Solicitud>> GetSolicitudesConResponsableAsync(string? estado = null, string? prioridad = null)
         {
-            return await _context.Solicitudes
+            var query = _context.Solicitudes
                 .Include(s => s.UsuarioResponsable)
+                .AsQueryable();
+
+            // Filtro dinámico por Estado
+            if (!string.IsNullOrWhiteSpace(estado) && Enum.TryParse<EstadoSolicitud>(estado, true, out var estadoEnum))
+            {
+                query = query.Where(s => s.Estado == estadoEnum);
+            }
+
+            // Filtro dinámico por Prioridad
+            if (!string.IsNullOrWhiteSpace(prioridad) && Enum.TryParse<PrioridadSolicitud>(prioridad, true, out var prioridadEnum))
+            {
+                query = query.Where(s => s.Prioridad == prioridadEnum);
+            }
+
+            return await query
+                .OrderByDescending(s => s.FechaCreacion)
                 .ToListAsync();
         }
 

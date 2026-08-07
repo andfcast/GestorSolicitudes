@@ -38,6 +38,7 @@ namespace GestorSolicitudes.Application.Services
             return new AccesoDto
             {
                 Token = token,
+                Id = usuario.Id,
                 NombreUsuario = usuario.NombreUsuario,
                 Email = usuario.Email,
                 Rol = usuario.Rol.ToString(),

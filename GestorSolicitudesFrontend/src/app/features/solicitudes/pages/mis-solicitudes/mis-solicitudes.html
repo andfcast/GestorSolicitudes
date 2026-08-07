@@ -103,12 +103,22 @@
                   <button class="btn-action btn-detail" (click)="verDetalle(item.id)">
                     👁️ Ver Detalle
                   </button>
-                   @if (item.estado !== 'Resuelta' && item.estado !== 'Cerrada') {
+                  @if (item.estado !== 'Resuelta' && item.estado !== 'Cerrada') {
                     <button class="btn-action btn-edit" (click)="abrirEditar(item)">
                     ✏️ Editar
                     </button>
+                    @if(authService.isAdmin()) {
+                      <button class="btn-action btn-delete" (click)="borrarSolicitud(item.id)">
+                        🗑️ Borrar
+                      </button>
+                    }
+                  }
+                  @if (item.estado === 'Nueva' && authService.isAdmin()) {
+                    <button class="btn-action btn-assign" (click)="abrirModalAsignar(item)" title="Asignar Responsable">
+                      👤 Asignar
+                    </button>
                   }                  
-                  @if (item.estado === 'Nueva' || item.estado === 'Asignada') {
+                  @if (item.estado === 'Asignada') {
                     <button class="btn-action btn-process" (click)="actualizarEstado(item.id, 'EnProceso')">
                       Iniciar
                     </button>
@@ -155,4 +165,12 @@
   [isOpen]="mostrarModalDetalle()"
   [solicitudId]="solicitudSeleccionadaId()"
   (cerrarModal)="mostrarModalDetalle.set(false)"
+/>
+
+<app-asignar-usuario-modal
+  [isOpen]="mostrarModalAsignar()"
+  [solicitud]="solicitudParaAsignar()"
+  [listaAgentes]="listaAgentes()"
+  (cerrarModal)="cerrarModalAsignar()"
+  (asignacionExitosa)="cargarSolicitudes()"
 />
