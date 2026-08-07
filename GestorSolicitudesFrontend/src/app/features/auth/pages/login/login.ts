@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -34,13 +35,17 @@ export class Login {
 
     this.authService.login(this.loginForm.getRawValue()).subscribe({
       next: (response) => {
-        debugger;
         this.isLoading.set(false);
         if (response.rol === 'Agente') {
           this.router.navigate(['/dashboard/mis-solicitudes']);
         } else if (response.rol === 'Administrador') {
           this.router.navigate(['/dashboard/solicitudes']);
         }
+        Swal.fire({
+            icon: 'success',              
+            text: `Bienvenido, ${response.nombreUsuario}.`,
+            timer: 3000
+        });
       },
       error: (err) => {
         this.isLoading.set(false);
